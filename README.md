@@ -107,6 +107,26 @@ GET  /api/tools/{id}                Tool detail + reviews
 GET  /api/categories                All category names
 ```
 
+### Profiles and catalogue proposals
+
+Visitors can browse the verified catalogue without an account. A signed-in apprentice can save role, level and apprenticeship-standard context, which is used to personalise future recommendations:
+
+```
+PUT  /api/users/{user_id}/profile
+GET  /api/users/{user_id}/profile
+```
+
+An apprentice can also add an unlimited number of tools to their own view immediately. Global additions are held for human verification and cannot affect public ranking or recommendations until approved:
+
+```
+POST /api/tools/proposals            visibility: personal | global
+GET  /api/admin/tool-proposals
+POST /api/admin/tool-proposals/{id}/approve
+POST /api/admin/tool-proposals/{id}/reject
+```
+
+Pass `user_id` to `GET /api/tools` to include that apprentice's unverified personal tools. Personal tools are visibly unverified and are not returned to other users.
+
 ### Ask
 
 ```
@@ -154,6 +174,8 @@ Every guardrail lives in two places: as an instruction in the prompt and as a ch
 **Facts from rows.** Cost, limits, and scores are injected from the database. The model is instructed to quote them; code checks that any numeric claim in the answer matches the catalogue row.
 
 **Say when unsure.** The model must return `no_good_match: true` rather than stretch a weak fit. Unverified tools must be flagged as such in the `why` field.
+
+**Human-verified sources.** Search clicks and reviews can inform ranking experiments, but they cannot by themselves publish a tool or replace review evidence. Survey and approved-university-list imports pass through normalisation and the human verification queue; generic SEO lists and unaudited social posts are not treated as catalogue evidence.
 
 **Policy flags.** Tools with employer or assessment risk carry a `flag` field. The output schema requires a `watch_out` field, and code checks that flagged tools have a non-null `watch_out`.
 

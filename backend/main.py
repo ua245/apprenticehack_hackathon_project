@@ -15,6 +15,7 @@ from models import (
     AskRequest, AskResponse,
     ReviewRequest, ModerateRequest, ModerationResult,
     BiasCheckRequest, NormaliseRequest, LaunchPostRequest,
+    ApprenticeProfileRequest, ToolProposalRequest,
 )
 import prompts
 
@@ -34,6 +35,9 @@ app.add_middleware(
 # In-memory stores (swap to PostgreSQL for production)
 _reviews: dict[str, list[dict]] = {}  # keyed by tool_id
 _pending_reviews: list[dict] = []      # moderation queue
+_profiles: dict[str, dict] = {}
+_personal_tools: dict[str, list[dict]] = {}
+_pending_tools: list[dict] = []
 
 
 # ── Tools ────────────────────────────────────────────────────────────────────
@@ -43,9 +47,12 @@ def list_tools(
     category: Optional[str] = None,
     role: Optional[str] = None,
     q: Optional[str] = None,
+    user_id: Optional[str] = None,
     limit: int = Query(default=20, le=50),
 ):
-    tools = CATALOGUE
+    tools = list(CATALOGUE)
+    if user_id:
+        tools.extend(_personal_tools.get(user_id, []))
     if category and category != "All":
         tools = [t for t in tools if t["category"] == category]
     if role:
@@ -54,6 +61,54 @@ def list_tools(
         words = [w for w in q.lower().split() if len(w) > 2]
         tools = [t for t in tools if any(w in t["keywords"] for w in words)]
     return {"tools": tools[:limit], "total": len(tools)}
+
+
+@app.put("/api/users/{user_id}/profile")
+def save_profile(user_id: str, profile: ApprenticeProfileRequest):
+    _profiles[user_id] = profile.model_dump()
+    return {"user_id": user_id, "profile": _profiles[user_id]}
+
+
+@app.get("/api/users/{user_id}/profile")
+def get_profile(user_id: str):
+    return {"user_id": user_id, "profile": _profiles.get(user_id)}
+
+
+@app.post("/api/tools/proposals")
+def propose_tool(proposal: ToolProposalRequest):
+    proposal_doc = {
+        "id": f"proposal_{uuid.uuid4().hex}",
+        **proposal.model_dump(),
+        "created_at": datetime.utcnow().isoformat(),
+        "verified": False,
+    }
+
+    if proposal.visibility == "personal":
+        personal_tool = {
+            "id": proposal_doc["id"],
+            "category": proposal.category,
+            "name": proposal.name,
+            "cost": "unknown",
+            "roles": ["all"],
+            "usefulness": 0,
+            "learning": 0,
+            "recommend_pct": 0,
+            "desc": proposal.use_case,
+            "limits": "Personal submission — not yet community verified",
+            "flag": "Check your provider's policy before using this tool for work or assessments",
+            "verified": False,
+            "keywords": f"{proposal.name} {proposal.category} {proposal.use_case}".lower(),
+        }
+        _personal_tools.setdefault(proposal.user_id, []).append(personal_tool)
+        return {"status": "personal", "tool": personal_tool}
+
+    proposal_doc["status"] = "pending_human_verification"
+    _pending_tools.append(proposal_doc)
+    return {
+        "status": "pending_human_verification",
+        "message": "Thanks. A human reviewer must approve global catalogue additions.",
+        "proposal_id": proposal_doc["id"],
+    }
 
 
 @app.get("/api/categories")
@@ -148,6 +203,46 @@ def get_queue():
     return {"pending": _pending_reviews, "total": len(_pending_reviews)}
 
 
+@app.get("/api/admin/tool-proposals")
+def get_tool_proposals():
+    return {"pending": _pending_tools, "total": len(_pending_tools)}
+
+
+@app.post("/api/admin/tool-proposals/{proposal_id}/approve")
+def approve_tool_proposal(proposal_id: str):
+    idx = next((i for i, proposal in enumerate(_pending_tools) if proposal["id"] == proposal_id), None)
+    if idx is None:
+        raise HTTPException(status_code=404, detail="Tool proposal not found")
+
+    proposal = _pending_tools.pop(idx)
+    tool = {
+        "id": proposal["id"].replace("proposal_", "t_"),
+        "category": proposal["category"],
+        "name": proposal["name"],
+        "cost": "unknown",
+        "roles": ["all"],
+        "usefulness": 0,
+        "learning": 0,
+        "recommend_pct": 0,
+        "desc": proposal["use_case"],
+        "limits": "Community verification is in progress",
+        "flag": None,
+        "verified": True,
+        "keywords": f"{proposal['name']} {proposal['category']} {proposal['use_case']}".lower(),
+    }
+    CATALOGUE.append(tool)
+    return {"status": "approved", "tool": tool}
+
+
+@app.post("/api/admin/tool-proposals/{proposal_id}/reject")
+def reject_tool_proposal(proposal_id: str):
+    idx = next((i for i, proposal in enumerate(_pending_tools) if proposal["id"] == proposal_id), None)
+    if idx is None:
+        raise HTTPException(status_code=404, detail="Tool proposal not found")
+    _pending_tools.pop(idx)
+    return {"status": "rejected"}
+
+
 @app.post("/api/admin/queue/{review_id}/approve")
 def approve_review(review_id: str):
     idx = next((i for i, r in enumerate(_pending_reviews) if r["id"] == review_id), None)
@@ -196,6 +291,7 @@ def get_stats():
         "tools_total": len(CATALOGUE),
         "reviews_published": total_reviews,
         "reviews_pending": len(_pending_reviews),
+        "tool_proposals_pending": len(_pending_tools),
         "categories": len(CATEGORIES),
     }
 

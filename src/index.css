@@ -655,6 +655,19 @@ button {
   background: #1675c4;
 }
 
+.tool-logo.teal {
+  background: var(--teal);
+}
+
+.tool-card[role="link"] {
+  cursor: pointer;
+}
+
+.tool-card[role="link"]:focus-visible {
+  outline: 3px solid var(--teal-bright);
+  outline-offset: 3px;
+}
+
 .tool-title-row {
   display: flex;
   align-items: center;
@@ -1411,6 +1424,199 @@ footer > span {
     grid-column: auto;
     grid-row: auto;
     flex-wrap: wrap;
+  }
+}
+
+.information-section {
+  padding-top: 0;
+}
+
+.skill-grid,
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.skill-grid article,
+.people-grid a {
+  min-height: 170px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--white);
+  text-decoration: none;
+}
+
+.skill-grid span,
+.people-grid span {
+  color: var(--teal);
+  font: 10px var(--mono);
+  letter-spacing: 0.08em;
+}
+
+.skill-grid h3 {
+  margin: 20px 0 8px;
+  font: 650 20px/1.1 var(--display);
+  letter-spacing: -0.03em;
+}
+
+.skill-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.people-grid a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.people-grid a:hover {
+  border-color: var(--teal);
+  transform: translateY(-3px);
+}
+
+.people-grid strong {
+  margin-top: auto;
+  font: 650 20px/1.1 var(--display);
+  letter-spacing: -0.03em;
+}
+
+.people-grid .profile-avatar {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--teal);
+  font: 700 13px var(--display);
+  letter-spacing: 0;
+}
+
+.people-grid small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.people-grid em {
+  margin-top: 10px;
+  color: var(--teal);
+  font: 11px var(--mono);
+  font-style: normal;
+}
+
+.collection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.collection-summary a,
+.recommendations button {
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  color: var(--navy);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.collection-summary a:hover,
+.recommendations button:hover {
+  border-color: var(--teal);
+  background: var(--mint);
+}
+
+.app-notice {
+  position: fixed;
+  z-index: 30;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(440px, calc(100% - 48px));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  color: var(--white);
+  background: var(--navy);
+  box-shadow: 5px 5px 0 var(--teal);
+  font-size: 13px;
+}
+
+.app-notice button {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.ask-modal input {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--white);
+  font-size: 13px;
+}
+
+.ask-modal input:focus {
+  border-color: var(--teal);
+  outline: none;
+}
+
+.recommendations {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.recommendations strong {
+  font: 600 13px var(--display);
+}
+
+.recommendations button {
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.recommendations button > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.recommendations em {
+  color: var(--muted);
+  font: 10px var(--mono);
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.recommendations button > span:last-child {
+  max-width: 58%;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+@media (max-width: 720px) {
+  .skill-grid,
+  .people-grid {
+    grid-template-columns: 1fr;
   }
 }
 

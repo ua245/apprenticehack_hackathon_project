@@ -71,3 +71,20 @@ class LaunchPostRequest(BaseModel):
     submitter_role: str
     submitter_level: str
     submitter_use_case: str
+
+
+class ApprenticeProfileRequest(BaseModel):
+    role: Optional[str] = Field(default=None, max_length=80)
+    level: Optional[str] = Field(default=None, max_length=30)
+    apprenticeship_standard: Optional[str] = Field(default=None, max_length=160)
+
+
+class ToolProposalRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=120)
+    url: str = Field(..., min_length=8, max_length=2_000)
+    category: str = Field(..., min_length=2, max_length=80)
+    use_case: str = Field(..., min_length=10, max_length=1_000)
+    submitter_role: str = Field(..., min_length=2, max_length=80)
+    submitter_level: str = Field(..., min_length=2, max_length=30)
+    visibility: str = Field(..., pattern="^(personal|global)$")
+    user_id: str = Field(..., min_length=3, max_length=100)

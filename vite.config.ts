@@ -1,4 +1,4 @@
-import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type HtmlTagDescriptor, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
@@ -8,6 +8,7 @@ import siteConfiguration from './.figma/make/site.json'
 
 // Vite config — https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   // .figma/make/deploy-preview passes `--mode development` for cached-preview builds.
   const emitSourcemaps = mode === 'development'
 
@@ -24,6 +25,7 @@ react(),
       figmaErrorOverlayReplay(),
       figmaReactRefreshBoundaryFallback(),
       figmaMakeKitPlugin({ storiesGlob: '/src/**/*.stories.{ts,tsx,js,jsx}' }),
+      geminiRecommendationProxy(env.GEMINI_API_KEY),
     ],
     resolve: {
       alias: {
@@ -46,6 +48,132 @@ react(),
     },
   }
 })
+
+function geminiRecommendationProxy(apiKey: string | undefined): Plugin {
+  return {
+    name: 'gemini-recommendation-proxy',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/api/recommendations', async (req, res, next) => {
+        if (req.method !== 'POST') return next()
+
+        if (!apiKey) {
+          res.statusCode = 503
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'The AI guide is not configured.' }))
+          return
+        }
+
+        try {
+          let body = ''
+          for await (const chunk of req) {
+            body += chunk
+            if (body.length > 8_000) throw new Error('Request body is too large.')
+          }
+
+          const { prompt, role, level, tools } = JSON.parse(body) as {
+            prompt?: unknown
+            role?: unknown
+            level?: unknown
+            tools?: unknown
+          }
+
+          if (
+            typeof prompt !== 'string' ||
+            prompt.trim().length === 0 ||
+            prompt.length > 2_000 ||
+            !Array.isArray(tools) ||
+            tools.some((tool) => typeof tool !== 'object' || tool === null)
+          ) {
+            res.statusCode = 400
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'A valid recommendation request is required.' }))
+            return
+          }
+
+          const catalogue = tools
+            .map((tool) => {
+              const entry = tool as { id?: unknown; name?: unknown; category?: unknown; description?: unknown; role?: unknown }
+              return [entry.id, entry.name, entry.category, entry.description, entry.role].every((value) => typeof value === 'string')
+                ? `${entry.id}: ${entry.name} | ${entry.category} | ${entry.role} | ${entry.description}`
+                : null
+            })
+            .filter((entry): entry is string => entry !== null)
+            .join('\n')
+
+          const response = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey,
+              },
+              body: JSON.stringify({
+                systemInstruction: {
+                  parts: [
+                    {
+                      text: 'Recommend only items from the catalogue. Return exactly JSON with a recommendations array of up to three objects, each with an id and a concise reason.',
+                    },
+                  ],
+                },
+                contents: [
+                  {
+                    parts: [
+                      {
+                        text: `User goal: ${prompt}\nRole: ${typeof role === 'string' ? role : 'Not specified'}\nLevel: ${typeof level === 'string' ? level : 'Not specified'}\n\nCatalogue:\n${catalogue}`,
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  responseSchema: {
+                    type: 'OBJECT',
+                    properties: {
+                      recommendations: {
+                        type: 'ARRAY',
+                        items: {
+                          type: 'OBJECT',
+                          properties: {
+                            id: { type: 'STRING' },
+                            reason: { type: 'STRING' },
+                          },
+                          required: ['id', 'reason'],
+                        },
+                      },
+                    },
+                    required: ['recommendations'],
+                  },
+                },
+              }),
+            },
+          )
+
+          if (!response.ok) {
+            console.error(`Gemini recommendation request failed with ${response.status}.`)
+            res.statusCode = 502
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'The AI guide is temporarily unavailable.' }))
+            return
+          }
+
+          const gemini = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> }
+          const text = gemini.candidates?.[0]?.content?.parts?.[0]?.text
+          if (!text) throw new Error('Gemini returned no recommendation content.')
+
+          res.setHeader('Content-Type', 'application/json')
+          res.end(text)
+        } catch (error) {
+          console.error('Gemini recommendation proxy error:', error)
+          res.statusCode = 500
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'The AI guide could not process that request.' }))
+        }
+      })
+    },
+  }
+}
 
 type FigmaSiteConfiguration = {
   title?: string
