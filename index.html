@@ -1,0 +1,1023 @@
+<title>Tools-R-Us</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── Design tokens ──────────────────────────────────────────────────────── */
+:root {
+  --bg: #F8F9FB; --bg-glass: rgba(248,249,251,.9);
+  --surface: #FFFFFF; --surface-2: #F1F3F8; --surface-3: #E8EBF3;
+  --ink: #0D1117; --ink-2: #2D3348; --muted: #6E7891; --line: #E3E6EF;
+  --accent: #2563EB; --accent-soft: #EEF3FF; --accent-muted: #BAC8FD;
+  --green: #059669; --green-soft: #ECFDF5;
+  --amber: #D97706; --amber-soft: #FFFBEB;
+  --purple: #7C3AED; --purple-soft: #F5F3FF;
+  --red: #DC2626; --red-soft: #FEF2F2;
+  --code-bg: #0D1117; --code-surface: #131A24; --code-fg: #E6ECF1;
+  --display: "Bricolage Grotesque","Arial Narrow",sans-serif;
+  --body: "DM Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono: "JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r: 12px; --r-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(13,17,23,.05),0 2px 8px rgba(13,17,23,.04);
+  --shadow: 0 1px 4px rgba(13,17,23,.06),0 4px 16px rgba(13,17,23,.05);
+  --shadow-lg: 0 4px 12px rgba(13,17,23,.08),0 16px 48px rgba(13,17,23,.08);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --bg-glass:rgba(13,17,23,.9);
+  --surface:#161B25; --surface-2:#1C2333; --surface-3:#222A3E;
+  --ink:#E6ECF1; --ink-2:#B0BAD0; --muted:#7D8AAA; --line:#252D3E;
+  --accent:#4F8EFF; --accent-soft:#0D1A3B; --accent-muted:#1E3A7A;
+  --green:#34D399; --green-soft:#022C22;
+  --amber:#FBBF24; --amber-soft:#1C1508;
+  --purple:#C084FC; --purple-soft:#1E0F3E;
+  --red:#F87171; --red-soft:#2A0A0A;
+  --code-bg:#080C14; --code-surface:#0D1117;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.25);
+  --shadow:0 1px 4px rgba(0,0,0,.5),0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.6),0 16px 48px rgba(0,0,0,.4);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --bg-glass:rgba(13,17,23,.9);
+  --surface:#161B25; --surface-2:#1C2333; --surface-3:#222A3E;
+  --ink:#E6ECF1; --ink-2:#B0BAD0; --muted:#7D8AAA; --line:#252D3E;
+  --accent:#4F8EFF; --accent-soft:#0D1A3B; --accent-muted:#1E3A7A;
+  --green:#34D399; --green-soft:#022C22;
+  --amber:#FBBF24; --amber-soft:#1C1508;
+  --purple:#C084FC; --purple-soft:#1E0F3E;
+  --red:#F87171; --red-soft:#2A0A0A;
+  --code-bg:#080C14; --code-surface:#0D1117;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.25);
+  --shadow:0 1px 4px rgba(0,0,0,.5),0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.6),0 16px 48px rgba(0,0,0,.4);
+  color-scheme:dark}
+
+/* ── Reset & base ────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0} button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent);text-decoration:none}
+input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:24px}
+@media(max-width:640px){.wrap{padding-inline:16px}}
+.eyebrow{font:500 .72rem/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+nav{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:200;
+  background:var(--bg-glass);
+  backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:.75rem;height:52px}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;flex-shrink:0}
+.nav-logo-mark{
+  width:28px;height:28px;background:var(--ink);color:var(--bg);
+  border-radius:7px;display:grid;place-items:center;font:700 .7rem var(--display);flex-shrink:0}
+.nav-logo-text{font:600 .92rem var(--display);color:var(--ink);letter-spacing:-.01em}
+.nav-links{display:flex;gap:0;align-items:center}
+.nav-links a{
+  font:500 .83rem var(--body);color:var(--muted);text-decoration:none;
+  padding:5px 10px;border-radius:7px;transition:color .15s,background .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--ink);background:var(--surface-2)}
+.nav-links a.active{font-weight:600}
+.nav-right{display:flex;align-items:center;gap:7px}
+.role-pill{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+  padding:4px 10px 4px 8px;font:500 .75rem var(--body);color:var(--muted);
+  display:flex;align-items:center;gap:6px;cursor:pointer;transition:border-color .15s,color .15s}
+.role-pill:hover{border-color:var(--accent);color:var(--ink)}
+.role-pill select{
+  background:none;border:none;outline:none;appearance:none;-webkit-appearance:none;
+  font:500 .75rem var(--body);color:inherit;cursor:pointer;padding-right:2px}
+.nav-btn{
+  width:32px;height:32px;border:1px solid var(--line);background:var(--surface);
+  border-radius:8px;display:grid;place-items:center;color:var(--muted);
+  transition:background .15s,border-color .15s,color .15s}
+.nav-btn:hover{background:var(--surface-2);border-color:var(--ink);color:var(--ink)}
+.nav-btn svg{width:15px;height:15px;display:block}
+@media(max-width:580px){.nav-links{display:none}}
+
+/* ── Home view ───────────────────────────────────────────────────────────── */
+.hero{padding-block:72px 56px;border-bottom:1px solid var(--line)}
+h1.home-title{
+  font-size:clamp(2.4rem,5.5vw,4.5rem);font-weight:800;letter-spacing:-.04em;
+  margin-bottom:1.25rem;max-width:16ch}
+h1.home-title em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:44ch;margin-bottom:2rem;line-height:1.65}
+.search-bar{
+  display:flex;gap:0;max-width:580px;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.search-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),var(--shadow)}
+.search-bar input{
+  flex:1;border:none;outline:none;padding:.75rem 1rem;
+  background:transparent;font:400 .95rem var(--body);min-width:0}
+.search-bar button{
+  background:var(--accent);color:#fff;border:none;
+  padding:.75rem 1.1rem;font:600 .88rem var(--body);
+  display:flex;align-items:center;gap:.4rem;
+  transition:background .15s;white-space:nowrap;flex-shrink:0}
+.search-bar button:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
+.search-bar button svg{width:14px;height:14px}
+
+.cat-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.5rem;padding-top:.75rem}
+.cat-chip{
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .75rem;font:500 .8rem var(--body);color:var(--muted);
+  cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+.cat-chip:hover{background:var(--surface-2);color:var(--ink);border-color:var(--ink)}
+.cat-chip.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:.75rem}
+
+/* ── Tool card ───────────────────────────────────────────────────────────── */
+.tool-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1.1rem;cursor:pointer;
+  display:grid;gap:.6rem;align-content:start;
+  transition:box-shadow .18s,transform .18s,border-color .18s}
+.tool-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--ink)}
+.card-top{display:flex;justify-content:space-between;align-items:start;gap:.5rem}
+.tool-name{font:700 1rem var(--display);letter-spacing:-.01em;line-height:1.2}
+.cost-badge{
+  font:600 .66rem var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  border-radius:5px;padding:.15rem .4rem;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.cost-free   {background:var(--green-soft);color:var(--green)}
+.cost-freemium{background:var(--accent-soft);color:var(--accent)}
+.cost-paid   {background:var(--purple-soft);color:var(--purple)}
+.cost-employer{background:var(--amber-soft);color:var(--amber)}
+.tool-cat-chip{
+  font:500 .68rem var(--mono);text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);background:var(--surface-2);border-radius:4px;
+  padding:.12rem .4rem;align-self:start}
+.tool-desc{font-size:.875rem;color:var(--muted);line-height:1.5}
+.card-stats{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.rec-pct{font:700 1.35rem var(--display);color:var(--ink);letter-spacing:-.02em;line-height:1}
+.rec-label{font-size:.75rem;color:var(--muted);margin-top:1px}
+.mini-ratings{display:grid;gap:.3rem;flex:1}
+.mini-row{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--muted)}
+.mini-row span:first-child{width:40px;flex-shrink:0}
+.mini-track{flex:1;height:4px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.mini-fill{height:100%;background:var(--accent);border-radius:999px}
+.tool-flag{
+  font:500 .75rem var(--body);color:var(--amber);
+  background:var(--amber-soft);border-radius:6px;padding:.3rem .6rem;line-height:1.4}
+
+/* ── Catalogue section ───────────────────────────────────────────────────── */
+#catalogue{padding-block:40px 64px}
+.catalogue-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
+.catalogue-head h2{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.result-count{font:500 .8rem var(--mono);color:var(--muted)}
+
+/* ── Ask / Chat view ─────────────────────────────────────────────────────── */
+.ask-layout{display:flex;flex-direction:column;height:calc(100vh - 52px)}
+.ask-header{
+  border-bottom:1px solid var(--line);padding:.75rem 0;
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;flex-shrink:0}
+.ask-title{font:700 1.05rem var(--display);letter-spacing:-.01em}
+.profile-selects{display:flex;gap:.5rem;align-items:center}
+.profile-selects select{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:.35rem .65rem;font:500 .82rem var(--body);color:var(--ink);
+  appearance:none;-webkit-appearance:none;outline:none;cursor:pointer;
+  transition:border-color .15s}
+.profile-selects select:focus{border-color:var(--accent)}
+
+.chat-area{flex:1;overflow-y:auto;padding-block:1.25rem;display:flex;flex-direction:column;gap:.9rem}
+.chat-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.5rem;text-align:center;padding:2rem}
+.chat-empty-icon{
+  width:56px;height:56px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:14px;display:grid;place-items:center;font:700 1.1rem var(--display);color:var(--muted)}
+.chat-empty h3{font:700 1.1rem var(--display);margin:0}
+.chat-empty p{color:var(--muted);font-size:.9rem;max-width:32ch}
+.suggestions{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center}
+.suggestion-btn{
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:.35rem .8rem;font:400 .82rem var(--body);color:var(--muted);
+  cursor:pointer;text-align:left;
+  transition:background .12s,border-color .12s,color .12s}
+.suggestion-btn:hover{background:var(--accent-soft);border-color:var(--accent-muted);color:var(--accent)}
+
+.msg{display:flex;gap:.6rem;align-items:start;max-width:760px}
+.msg-user{flex-direction:row-reverse;margin-left:auto}
+.msg-avatar{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--ink);color:var(--bg);
+  display:grid;place-items:center;font:700 .7rem var(--display);flex-shrink:0;margin-top:2px}
+.msg-user .msg-avatar{background:var(--accent)}
+.msg-body{display:flex;flex-direction:column;gap:.65rem;min-width:0;max-width:680px}
+.msg-bubble{
+  padding:.7rem .9rem;border-radius:var(--r);font-size:.9rem;line-height:1.55}
+.msg-user .msg-bubble{background:var(--accent);color:#fff;border-radius:var(--r) var(--r) 4px var(--r)}
+.msg-assistant .msg-bubble{background:var(--surface);border:1px solid var(--line);border-radius:4px var(--r) var(--r) var(--r)}
+.msg-intro{font-size:.9rem;color:var(--muted);line-height:1.55;padding-inline:.1rem}
+
+/* rec cards inside chat */
+.rec-cards{display:flex;flex-direction:column;gap:.5rem}
+.rec-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:.9rem 1rem;display:grid;gap:.4rem;
+  transition:border-color .15s,box-shadow .15s}
+.rec-card:hover{border-color:var(--ink);box-shadow:var(--shadow)}
+.rec-card-head{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.rec-card-name{font:700 .97rem var(--display);letter-spacing:-.01em}
+.rec-why{font-size:.85rem;color:var(--muted);line-height:1.5}
+.rec-watch{
+  font:400 .78rem var(--mono);color:var(--amber);
+  border:1px solid var(--amber);border-radius:5px;padding:.28rem .5rem;opacity:.85}
+.rec-footer{display:flex;gap:.5rem;align-items:center;margin-top:.25rem}
+.btn-outline{
+  background:transparent;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:.3rem .7rem;font:500 .78rem var(--body);color:var(--muted);
+  transition:background .12s,border-color .12s,color .12s}
+.btn-outline:hover{background:var(--surface-2);border-color:var(--ink);color:var(--ink)}
+.no-match{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1rem;font-size:.9rem;color:var(--muted)}
+
+.typing-dot{display:inline-flex;gap:3px;align-items:center;padding:.1rem 0}
+.typing-dot i{
+  width:5px;height:5px;border-radius:50%;background:var(--muted);
+  animation:bounce .9s infinite}
+.typing-dot i:nth-child(2){animation-delay:.15s}
+.typing-dot i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+.chat-input-bar{
+  border-top:1px solid var(--line);padding:.75rem 0;
+  display:flex;gap:.5rem;align-items:end;flex-shrink:0}
+.chat-input{
+  flex:1;min-height:44px;max-height:140px;
+  padding:.65rem .85rem;border:1.5px solid var(--line);border-radius:var(--r);
+  background:var(--surface);resize:none;outline:none;
+  font:400 .9rem var(--body);line-height:1.5;overflow-y:auto;
+  transition:border-color .15s,box-shadow .15s}
+.chat-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.send-btn{
+  width:44px;height:44px;background:var(--accent);border:none;
+  border-radius:var(--r);display:grid;place-items:center;color:#fff;
+  transition:background .15s,transform .1s;flex-shrink:0}
+.send-btn:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
+.send-btn:active{transform:scale(.95)}
+.send-btn svg{width:16px;height:16px}
+.send-btn:disabled{background:var(--surface-3);cursor:not-allowed}
+
+/* ── Tool detail ─────────────────────────────────────────────────────────── */
+.detail-wrap{padding-block:32px 64px}
+.back-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font:500 .83rem var(--body);color:var(--muted);
+  background:none;border:none;padding:0;margin-bottom:1.75rem;
+  transition:color .15s}
+.back-btn:hover{color:var(--ink)}
+.back-btn svg{width:14px;height:14px}
+.tool-hero{
+  display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:start;
+  border-bottom:1px solid var(--line);padding-bottom:1.75rem;margin-bottom:1.75rem}
+.tool-hero-left{display:grid;gap:.6rem}
+.tool-hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.03em}
+.tool-hero-desc{font-size:1rem;color:var(--muted);max-width:52ch;line-height:1.6}
+.tool-hero-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.tool-hero-right{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1.1rem 1.25rem;box-shadow:var(--shadow);display:grid;gap:.8rem;min-width:200px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;font-size:.875rem}
+.stat-row b{font:800 1.6rem var(--display);color:var(--ink);letter-spacing:-.02em}
+.stat-row span{color:var(--muted);font-size:.78rem}
+.rating-row{display:grid;gap:.35rem}
+.rating-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+.rating-track{height:5px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.rating-fill{height:100%;background:var(--accent);border-radius:999px}
+.ask-about-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);
+  padding:.6rem .9rem;font:600 .83rem var(--body);
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  transition:background .15s;width:100%}
+.ask-about-btn:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
+@media(max-width:640px){.tool-hero{grid-template-columns:1fr}.tool-hero-right{display:none}}
+
+.detail-tabs{display:flex;gap:.3rem;margin-bottom:1.5rem;border-bottom:1px solid var(--line);padding-bottom:.1rem}
+.dtab{
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:.5rem .75rem;font:500 .87rem var(--body);color:var(--muted);
+  margin-bottom:-1px;transition:color .15s,border-color .15s;cursor:pointer}
+.dtab.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.dtab:hover:not(.active){color:var(--ink)}
+
+/* reviews */
+.reviews-list{display:grid;gap:.75rem}
+.review-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1rem 1.1rem;display:grid;gap:.5rem}
+.review-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.review-role{font:600 .75rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.review-level{font-size:.78rem;color:var(--muted)}
+.review-scores{display:flex;gap:.6rem;margin-left:auto}
+.review-score{font:500 .72rem var(--mono);color:var(--muted)}
+.stars{color:var(--accent);font-size:.85rem;letter-spacing:.1em}
+.review-text{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.review-badge-rec{
+  font:600 .68rem var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--green);background:var(--green-soft);border-radius:5px;padding:.13rem .4rem}
+
+.no-reviews{
+  background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);
+  padding:2.5rem;text-align:center;color:var(--muted)}
+
+/* review form */
+.review-form{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1.25rem;display:grid;gap:1rem}
+.form-row{display:grid;gap:.35rem}
+.form-row label{font:600 .78rem var(--body);color:var(--ink-2)}
+.form-row select,.form-row textarea{
+  width:100%;padding:.55rem .7rem;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  background:var(--bg);color:var(--ink);font:400 .875rem var(--body);
+  outline:none;transition:border-color .15s,box-shadow .15s}
+.form-row select:focus,.form-row textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.form-row textarea{resize:vertical}
+.form-row select{appearance:none;-webkit-appearance:none}
+.star-picker{display:flex;gap:.25rem}
+.star-btn{background:none;border:none;font-size:1.2rem;color:var(--line);transition:color .1s;padding:0}
+.star-btn.lit{color:var(--accent)}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.submit-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);
+  padding:.65rem 1.2rem;font:600 .9rem var(--body);align-self:start;
+  transition:background .15s}
+.submit-btn:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
+.submit-result{
+  padding:.75rem 1rem;border-radius:var(--r-sm);font-size:.9rem;font-weight:500;
+  border:1px solid}
+.submit-ok{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.submit-err{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+.submit-info{background:var(--amber-soft);color:var(--amber);border-color:var(--amber)}
+
+/* ── Admin view ──────────────────────────────────────────────────────────── */
+.admin-wrap{padding-block:40px 64px}
+.admin-wrap h2{font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem}
+.admin-wrap>.eyebrow{display:block;margin-bottom:1.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-bottom:2.5rem}
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.1rem}
+.stat-card .num{font:800 2rem var(--display);letter-spacing:-.03em;line-height:1;margin-bottom:.25rem}
+.stat-card .lbl{font-size:.82rem;color:var(--muted)}
+.admin-section{margin-bottom:2.5rem}
+.admin-section h3{font:700 1.1rem var(--display);letter-spacing:-.01em;margin-bottom:1rem}
+.queue-empty{background:var(--surface-2);border-radius:var(--r);padding:1.5rem;text-align:center;color:var(--muted);font-size:.9rem}
+.queue-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1rem;display:grid;gap:.6rem;margin-bottom:.75rem}
+.queue-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.queue-text{font-size:.9rem;color:var(--ink-2);line-height:1.5}
+.queue-mod{background:var(--surface-2);border-radius:var(--r-sm);padding:.6rem .8rem;font:.78rem var(--mono)}
+.queue-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.btn-approve{background:var(--green-soft);color:var(--green);border:1px solid var(--green);border-radius:var(--r-sm);padding:.35rem .75rem;font:600 .8rem var(--body)}
+.btn-approve:hover{background:var(--green);color:#fff}
+.btn-reject{background:var(--red-soft);color:var(--red);border:1px solid var(--red);border-radius:var(--r-sm);padding:.35rem .75rem;font:600 .8rem var(--body)}
+.btn-reject:hover{background:var(--red);color:#fff}
+.bias-form{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.bias-form select{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:.4rem .7rem;font:400 .875rem var(--body);outline:none}
+.bias-result{margin-top:.75rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1rem}
+</style>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="wrap nav-inner">
+    <a href="#home" class="nav-logo" id="navLogo">
+      <span class="nav-logo-mark">T↗</span>
+      <span class="nav-logo-text">Tools-R-Us</span>
+    </a>
+    <div class="nav-links">
+      <a href="#home" id="navDiscover">Discover</a>
+      <a href="#ask" id="navAsk">Ask AI</a>
+      <a href="#admin" id="navAdmin">Admin</a>
+    </div>
+    <div class="nav-right">
+      <div class="role-pill" title="Your role">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="3.5" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M1 10c0-2.21 2.015-4 4.5-4s4.5 1.79 4.5 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+        <select id="navRole" aria-label="Your role">
+          <option value="">Any role</option>
+          <option value="software">Software</option>
+          <option value="data" selected>Data</option>
+          <option value="finance">Finance</option>
+          <option value="business">Business</option>
+          <option value="cyber">Cyber</option>
+        </select>
+      </div>
+      <button class="nav-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5v1M7.5 12.5v1M1.5 7.5h1M12.5 7.5h1M3.4 3.4l.7.7M10.9 10.9l.7.7M3.4 11.6l.7-.7M10.9 4.1l.7-.7M7.5 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main id="app"></main>
+
+<script>
+// ─── Catalogue (mirrors backend/catalogue.py) ─────────────────────────────
+const CATALOGUE = [
+  {id:"t_claude",cat:"AI",n:"Claude",cost:"freemium",roles:["all"],u:5,l:5,rec:92,desc:"Conversational AI for explaining concepts, drafting and reviewing work.",lim:"Free plan usage limits reset after a few hours",flag:"Check your provider's AI policy before using it on assessed work",v:true,k:"ai assistant coursework assessed explain code learn writing draft"},
+  {id:"t_chatgpt",cat:"AI",n:"ChatGPT",cost:"freemium",roles:["all"],u:5,l:4,rec:89,desc:"General-purpose AI assistant from OpenAI. GPT-4o on the free plan.",lim:"GPT-4 in paid plan; free tier uses GPT-4o with rate limits",flag:"Check your provider's AI policy before using it on assessed work",v:true,k:"ai assistant chatbot gpt openai coursework explain help writing"},
+  {id:"t_copilot",cat:"AI",n:"GitHub Copilot",cost:"free",roles:["software","data"],u:5,l:5,rec:88,desc:"AI code completion inside VS Code and JetBrains. Free for students.",lim:"Free with GitHub Education pack; verify your student email",flag:null,v:true,k:"code ai autocomplete editor github students programming copilot"},
+  {id:"t_colab",cat:"Dev & Data",n:"Google Colab",cost:"freemium",roles:["data","software"],u:5,l:5,rec:91,desc:"Python notebooks with free GPU in the browser. No local setup needed.",lim:"Free GPU time is limited; idle sessions time out after 90 min",flag:null,v:true,k:"python notebook gpu ml machine learning jupyter browser locked laptop data science"},
+  {id:"t_kaggle",cat:"Dev & Data",n:"Kaggle",cost:"free",roles:["data"],u:4,l:5,rec:88,desc:"Free notebooks, datasets, short courses and ML competitions.",lim:"Weekly GPU/TPU quotas; 30 hrs GPU per week",flag:null,v:true,k:"python notebook gpu datasets ml competition data practice courses free"},
+  {id:"t_vscode",cat:"Dev & Data",n:"VS Code",cost:"free",roles:["software","data"],u:5,l:4,rec:94,desc:"The de-facto standard code editor. Extensions for every language.",lim:"Free; some extensions need separate accounts",flag:null,v:true,k:"code editor python notebook coding ide vscode programming"},
+  {id:"t_github",cat:"Dev & Data",n:"GitHub",cost:"free",roles:["software","data"],u:5,l:4,rec:93,desc:"Version control, code review, project boards and your portfolio.",lim:"Free for public and private repos",flag:null,v:true,k:"git version control code repo portfolio projects pull request review"},
+  {id:"t_hf",cat:"Dev & Data",n:"Hugging Face",cost:"freemium",roles:["data","software"],u:4,l:5,rec:84,desc:"Host and share ML models, datasets and interactive Spaces demos.",lim:"Free tier covers most needs; paid hardware for bigger Spaces",flag:null,v:true,k:"models ml ai demo gpu datasets portfolio transformers"},
+  {id:"t_tableau",cat:"Dev & Data",n:"Tableau Public",cost:"free",roles:["data","business"],u:4,l:4,rec:79,desc:"Drag-and-drop data visualisation. Publish interactive charts for free.",lim:"Dashboards are public; no private workbooks on free plan",flag:null,v:true,k:"data visualisation charts dashboards tableau business analytics viz"},
+  {id:"t_notion",cat:"Productivity",n:"Notion",cost:"freemium",roles:["all"],u:4,l:4,rec:76,desc:"Free-form notes, wikis, databases and task boards in one workspace.",lim:"Free plan is generous; education plan with .ac.uk email",flag:null,v:true,k:"notes uni search organise revision free wiki database productivity"},
+  {id:"t_obsidian",cat:"Productivity",n:"Obsidian",cost:"free",roles:["all"],u:4,l:4,rec:80,desc:"Local Markdown notes with backlinks and a graph view of your knowledge.",lim:"Free for personal use; Sync and Publish are paid add-ons",flag:null,v:true,k:"notes markdown local private graph links knowledge management second brain"},
+  {id:"t_nn",cat:"Productivity",n:"Notesnook",cost:"freemium",roles:["all"],u:4,l:3,rec:77,desc:"End-to-end encrypted notes when privacy matters. Open source.",lim:"Free plan with limits on attachments and devices",flag:null,v:true,k:"notes encrypted private search free secure privacy"},
+  {id:"t_anki",cat:"Productivity",n:"Anki",cost:"free",roles:["all"],u:5,l:5,rec:91,desc:"Spaced-repetition flashcards that adapt to what you're forgetting.",lim:"Free on all platforms; AnkiMobile (iOS) is paid",flag:null,v:true,k:"revision flashcards spaced repetition memory study exams learning recall"},
+  {id:"t_miro",cat:"Productivity",n:"Miro",cost:"freemium",roles:["business","software"],u:4,l:3,rec:74,desc:"Infinite whiteboard for diagrams, planning and remote workshops.",lim:"3 boards on free plan; collaborators limited",flag:null,v:true,k:"whiteboard diagrams planning workshops brainstorm collaboration"},
+  {id:"t_smart",cat:"Work & OTJ",n:"Smart Assessor",cost:"employer",roles:["all"],u:3,l:2,rec:40,desc:"Portfolio and off-the-job evidence tracker from most training providers.",lim:"Provided by your training provider — you can't choose it",flag:null,v:true,k:"otj off the job hours portfolio evidence log assessor review track apprenticeship"},
+  {id:"t_cal",cat:"Work & OTJ",n:"Outlook / Teams Calendar",cost:"employer",roles:["all"],u:5,l:2,rec:90,desc:"Block study days, track OTJ hours and avoid being booked in on uni days.",lim:"Work/personal calendar sync is often blocked by IT",flag:null,v:true,k:"calendar otj hours schedule uni days track time reminders outlook teams blocks"},
+  {id:"t_planner",cat:"Work & OTJ",n:"Microsoft Planner",cost:"employer",roles:["all"],u:3,l:2,rec:68,desc:"Simple Kanban boards built into Teams and Microsoft 365.",lim:"Requires employer Microsoft 365 licence",flag:null,v:true,k:"kanban tasks planner project management teams m365 todo sprint"},
+  {id:"t_bw",cat:"Security",n:"Bitwarden",cost:"free",roles:["all"],u:5,l:2,rec:96,desc:"Open-source password manager. Unlimited logins, devices and sharing free.",lim:"Premium is £8/yr and adds advanced 2FA; free covers everything",flag:"Some employers mandate their own password manager — check first",v:true,k:"passwords password manager logins security forget browser 2fa"},
+  {id:"t_slack",cat:"Communication",n:"Slack",cost:"employer",roles:["all"],u:4,l:2,rec:78,desc:"Channels-based messaging. Most tech employers use it alongside Teams.",lim:"Usually employer-provided; personal free plan limits message history",flag:null,v:true,k:"chat messaging channels workplace communication slack async"},
+  {id:"t_loom",cat:"Communication",n:"Loom",cost:"freemium",roles:["all"],u:4,l:3,rec:81,desc:"Record quick screen + camera videos to explain things async. Beats a long email.",lim:"Free plan: 25 videos, 5 min each",flag:null,v:true,k:"screen record video async communication walkthrough demo explain loom"},
+];
+
+const SAMPLE_REVIEWS = {
+  t_colab:[{role:"Data",level:"Level 4",u:5,l:5,rec:true,text:"No set-up, which matters when your work laptop is locked down. GPU sessions are fast for small models."}],
+  t_kaggle:[{role:"Data",level:"Level 5",u:4,l:5,rec:true,text:"The free courses plus a real competition taught me more than a module did. Quotas are fine for coursework."}],
+  t_vscode:[{role:"Software",level:"Level 5",u:5,l:4,rec:true,text:"Learn the command palette and multi-cursor in week one. The Git integration alone saves me an hour a week."}],
+  t_bw:[{role:"Finance",level:"Level 3",u:5,l:2,rec:true,text:"Juggling uni, work and personal logins was impossible without it. Took 10 min to set up."}],
+  t_notion:[{role:"Data",level:"Level 6",u:4,l:4,rec:true,text:"A great second brain. I stopped when it became organising instead of studying."}],
+  t_claude:[{role:"Software",level:"Level 6",u:5,l:5,rec:true,text:"I ask it to explain why, not just hand me the answer. Policy check is worth doing first though."}],
+  t_anki:[{role:"Cyber",level:"Level 4",u:5,l:5,rec:true,text:"10 minutes of Anki every morning before work. Failed way fewer module assessments after."}],
+  t_github:[{role:"Software",level:"Level 5",u:5,l:4,rec:true,text:"Your GitHub profile is your CV by Level 5. Start committing everything from day one."}],
+};
+
+const SUGGESTIONS = [
+  "I need somewhere to run Python notebooks with a GPU — my work laptop is locked down.",
+  "How do I keep track of my OTJ hours?",
+  "Best free tool for taking searchable uni notes?",
+  "Can I use AI on my assessed coursework?",
+  "I keep forgetting passwords for uni and work.",
+  "What should I use for revision before my end-point assessment?",
+];
+
+const CATEGORIES = ["All","AI","Dev & Data","Productivity","Work & OTJ","Security","Communication"];
+const ROLES = {software:"Software",data:"Data",finance:"Finance",business:"Business",cyber:"Cyber"};
+const STANDARDS = {software:"Software Developer",data:"Data Analyst",finance:"Accountancy Professional",business:"Business Analyst",cyber:"Cyber Security Technologist"};
+
+// ─── State ────────────────────────────────────────────────────────────────
+const S = {
+  view:"home", toolId:null, catFilter:"All", query:"",
+  role:"data", level:"Level 4",
+  messages:[], reviews:Object.fromEntries(CATALOGUE.map(t=>[t.id,[...(SAMPLE_REVIEWS[t.id]||[])]])),
+  detailTab:"about", pending:[],
+  reviewForm:{u:5,l:5},
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+
+// ─── Routing ──────────────────────────────────────────────────────────────
+function navigate(view, id=null) {
+  S.view=view; S.toolId=id;
+  history.pushState({view,id},"","#"+view+(id?"/"+id:""));
+  renderApp();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+window.onpopstate = e => { if(e.state){S.view=e.state.view;S.toolId=e.state.id;renderApp();} };
+function handleHash() {
+  const h = location.hash.replace("#",""); if(!h){S.view="home";return;}
+  const [v,...rest]=h.split("/"); S.view=v||"home"; S.toolId=rest[0]||null;
+}
+
+// ─── Render router ────────────────────────────────────────────────────────
+function renderApp() {
+  const app = $("app");
+  document.querySelectorAll(".nav-links a").forEach(a => a.classList.remove("active"));
+  const navMap={home:"navDiscover",ask:"navAsk",admin:"navAdmin"};
+  if(navMap[S.view]) $(navMap[S.view])?.classList.add("active");
+  switch(S.view) {
+    case "home":  app.innerHTML=renderHome(); bindHomeEvents(); break;
+    case "ask":   app.innerHTML=renderAsk();  bindAskEvents();  break;
+    case "tool":  app.innerHTML=renderTool(); bindToolEvents(); break;
+    case "admin": app.innerHTML=renderAdmin();bindAdminEvents();break;
+    default:      app.innerHTML=renderHome(); bindHomeEvents();
+  }
+}
+
+// ─── Home view ────────────────────────────────────────────────────────────
+function filteredTools() {
+  let tools = CATALOGUE;
+  if(S.catFilter!=="All") tools=tools.filter(t=>t.cat===S.catFilter);
+  if(S.role) tools=tools.filter(t=>t.roles.includes(S.role)||t.roles.includes("all"));
+  if(S.query) {
+    const w=S.query.toLowerCase().split(/\s+/).filter(x=>x.length>2);
+    tools=tools.filter(t=>w.some(x=>t.k.includes(x)||t.n.toLowerCase().includes(x)||t.desc.toLowerCase().includes(x)));
+  }
+  return tools;
+}
+
+function renderHome() {
+  const tools = filteredTools();
+  return `
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow" style="display:block;margin-bottom:.8rem">Tools for UK apprentices</span>
+      <h1 class="home-title">Find the right tool<br>for your <em>apprenticeship</em></h1>
+      <p class="hero-sub">Verified by apprentices who actually use them. No affiliate links, no sponsored positions.</p>
+      <div class="search-bar" role="search">
+        <input type="text" id="searchInput" placeholder="e.g. run Python notebooks, track OTJ hours…" value="${esc(S.query)}" autocomplete="off">
+        <button type="button" id="searchAsk">
+          Ask AI
+          <svg viewBox="0 0 14 14" fill="none"><path d="M7 1l6 6-6 6M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="catalogue" class="wrap">
+    <div class="cat-row">
+      ${CATEGORIES.map(c=>`<button class="cat-chip${c===S.catFilter?" active":""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}
+    </div>
+    <div class="catalogue-head">
+      <h2>${S.catFilter==="All"?"All tools":S.catFilter}</h2>
+      <span class="result-count">${tools.length} tool${tools.length!==1?"s":""}</span>
+    </div>
+    <div class="tool-grid">
+      ${tools.length ? tools.map(renderToolCard).join("") : '<p style="color:var(--muted);padding:2rem 0">No tools match your filters.</p>'}
+    </div>
+  </div>`;
+}
+
+function renderToolCard(t) {
+  const revs = S.reviews[t.id]||[];
+  return `
+  <article class="tool-card" data-id="${t.id}" role="button" tabindex="0" aria-label="${esc(t.n)}">
+    <div class="card-top">
+      <div>
+        <div class="tool-name">${esc(t.n)}</div>
+        <span class="tool-cat-chip">${esc(t.cat)}</span>
+      </div>
+      <span class="cost-badge cost-${t.cost.replace(/\s+/g,"-")}">${t.cost}</span>
+    </div>
+    <p class="tool-desc">${esc(t.desc)}</p>
+    <div class="card-stats">
+      <div>
+        <div class="rec-pct">${t.rec}%</div>
+        <div class="rec-label">recommend${revs.length?` · ${revs.length} review${revs.length!==1?"s":""}`:""}</div>
+      </div>
+      <div class="mini-ratings">
+        <div class="mini-row"><span>Useful</span><div class="mini-track"><div class="mini-fill" style="width:${t.u*20}%"></div></div></div>
+        <div class="mini-row"><span>Learn</span><div class="mini-track"><div class="mini-fill" style="width:${t.l*20}%"></div></div></div>
+      </div>
+    </div>
+    ${t.flag?`<div class="tool-flag">⚠ ${esc(t.flag)}</div>`:""}
+  </article>`;
+}
+
+function bindHomeEvents() {
+  const si=$("searchInput");
+  si?.addEventListener("input",e=>{S.query=e.target.value;renderApp()});
+  si?.addEventListener("keydown",e=>{if(e.key==="Enter"&&S.query.trim()){S.messages=[];navigate("ask");}});
+  $("searchAsk")?.addEventListener("click",()=>{S.messages=[];navigate("ask");});
+  document.querySelectorAll(".cat-chip").forEach(b=>b.addEventListener("click",()=>{S.catFilter=b.dataset.cat;renderApp();}));
+  document.querySelectorAll(".tool-card").forEach(c=>{
+    const go=()=>navigate("tool",c.dataset.id);
+    c.addEventListener("click",go);
+    c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")go();});
+  });
+}
+
+// ─── Ask / Chat view ──────────────────────────────────────────────────────
+function renderAsk() {
+  const msgs = S.messages.map(renderMessage).join("");
+  const empty = S.messages.length===0 ? `
+    <div class="chat-empty">
+      <div class="chat-empty-icon">T↗</div>
+      <h3>What do you need help with?</h3>
+      <p>Ask a question and I'll find the right tools from the verified catalogue.</p>
+      <div class="suggestions">
+        ${SUGGESTIONS.map(s=>`<button class="suggestion-btn" data-q="${esc(s)}">${esc(s)}</button>`).join("")}
+      </div>
+    </div>` : "";
+  return `
+  <div class="ask-layout">
+    <div class="wrap ask-header">
+      <span class="ask-title">Ask for a recommendation</span>
+      <div class="profile-selects">
+        <select id="askRole" aria-label="Role">
+          <option value="">Any role</option>
+          ${Object.entries(ROLES).map(([v,l])=>`<option value="${v}"${S.role===v?" selected":""}>${l}</option>`).join("")}
+        </select>
+        <select id="askLevel" aria-label="Level">
+          ${["Level 3","Level 4","Level 5","Level 6","Level 7"].map(l=>`<option${S.level===l?" selected":""}>${l}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="wrap chat-area" id="chatArea">
+      ${empty}
+      ${msgs}
+    </div>
+    <div class="wrap chat-input-bar">
+      <textarea class="chat-input" id="chatInput" rows="1" placeholder="Type a question…">${S.query?esc(S.query):""}</textarea>
+      <button class="send-btn" id="sendBtn" type="button" aria-label="Send">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 12V4M4 8l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderMessage(m) {
+  if(m.role==="user") return `
+    <div class="msg msg-user">
+      <div class="msg-avatar">U</div>
+      <div class="msg-body"><div class="msg-bubble">${esc(m.content)}</div></div>
+    </div>`;
+  if(m.role==="typing") return `
+    <div class="msg msg-assistant" id="typingMsg">
+      <div class="msg-avatar">T</div>
+      <div class="msg-body"><div class="msg-bubble"><span class="typing-dot"><i></i><i></i><i></i></span></div></div>
+    </div>`;
+  // assistant
+  const recs = (m.recs||[]).map(r=>{
+    const tool=CATALOGUE.find(t=>t.id===r.tool_id);
+    if(!tool)return"";
+    return `
+      <article class="rec-card" data-id="${tool.id}" role="button" tabindex="0">
+        <div class="rec-card-head">
+          <span class="rec-card-name">${esc(tool.n)}</span>
+          <span class="cost-badge cost-${tool.cost}">${tool.cost}</span>
+        </div>
+        <p class="rec-why">${esc(r.why)}</p>
+        ${r.watch_out?`<p class="rec-watch">Watch out: ${esc(r.watch_out)}</p>`:""}
+        <div class="rec-footer">
+          <button class="btn-outline" data-id="${tool.id}">View tool →</button>
+        </div>
+      </article>`;
+  }).join("");
+  const noMatch = m.no_match ? `<div class="no-match">${esc(m.follow_up||"No good match found. Can you describe the problem in more detail?")}</div>` : "";
+  return `
+    <div class="msg msg-assistant">
+      <div class="msg-avatar">T</div>
+      <div class="msg-body">
+        ${m.intro?`<p class="msg-intro">${esc(m.intro)}</p>`:""}
+        ${recs?`<div class="rec-cards">${recs}</div>`:""}
+        ${noMatch}
+      </div>
+    </div>`;
+}
+
+function bindAskEvents() {
+  $("askRole")?.addEventListener("change",e=>{S.role=e.target.value;$("navRole").value=e.target.value;});
+  $("askLevel")?.addEventListener("change",e=>S.level=e.target.value);
+  const input=$("chatInput"), btn=$("sendBtn");
+  input?.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendQuestion();}
+  });
+  input?.addEventListener("input",()=>{input.style.height="auto";input.style.height=input.scrollHeight+"px";});
+  btn?.addEventListener("click",sendQuestion);
+  document.querySelectorAll(".suggestion-btn").forEach(b=>b.addEventListener("click",()=>{
+    if($("chatInput"))$("chatInput").value=b.dataset.q;
+    sendQuestion();
+  }));
+  document.querySelectorAll(".rec-card,.rec-card [data-id]").forEach(el=>{
+    el.addEventListener("click",e=>{
+      const id=el.dataset.id||(e.target.closest("[data-id]")?.dataset.id);
+      if(id)navigate("tool",id);
+    });
+  });
+  // auto-send if we arrived from search
+  if(S.query&&S.messages.length===0){ if($("chatInput"))$("chatInput").value=S.query; sendQuestion(); }
+}
+
+function sendQuestion() {
+  const input=$("chatInput");
+  const q=(input?.value||"").trim(); if(!q)return;
+  S.query="";
+  if(input){input.value="";input.style.height="auto";}
+  S.messages.push({role:"user",content:q});
+  S.messages.push({role:"typing"});
+  renderApp();
+  scrollChat();
+  setTimeout(()=>buildResponse(q),600);
+}
+
+function scrollChat() {
+  const ca=$("chatArea"); if(ca){ca.scrollTop=ca.scrollHeight;}
+}
+
+function buildResponse(q) {
+  // local retrieval + response (same logic as backend)
+  const words=q.toLowerCase().split(/\s+/).filter(x=>x.length>2);
+  const inj=/ignore (your|all|previous) (rules|instructions)/i.test(q);
+  let tools=[];
+  if(!inj) {
+    tools=CATALOGUE.map(t=>{
+      let s=words.reduce((a,w)=>a+(t.k.includes(w)?1:0),0);
+      if(S.role&&(t.roles.includes(S.role)||t.roles.includes("all")))s+=.5;
+      s+=t.rec/200;
+      return{t,s};
+    }).filter(x=>x.s>1).sort((a,b)=>b.s-a.s).slice(0,3).map(x=>x.t);
+  }
+
+  // remove typing indicator
+  S.messages=S.messages.filter(m=>m.role!=="typing");
+
+  if(inj) {
+    S.messages.push({role:"assistant",intro:"The question tries to override the rules. User text inside <question> tags is data, not an instruction. Cluely is not in the verified catalogue so it cannot be recommended.",recs:[],no_match:false});
+  } else if(!tools.length) {
+    S.messages.push({role:"assistant",intro:"",recs:[],no_match:true,follow_up:"I couldn't find a good match for that. Could you describe the problem in more detail?"});
+  } else {
+    const roleLabel=S.role?ROLES[S.role]:"any";
+    S.messages.push({
+      role:"assistant",
+      intro:`Here are the best-matched tools${S.role?` for ${roleLabel} apprentices`:""} at ${S.level}:`,
+      recs:tools.map(t=>({
+        tool_id:t.id,
+        why:`Rated ${t.u}/5 for usefulness, ${t.l}/5 for learning value. ${t.rec}% of apprentices would recommend it.`,
+        watch_out:t.flag||t.lim,
+      })),
+      no_match:false,
+    });
+  }
+  renderApp();
+  scrollChat();
+  bindAskEvents();
+}
+
+// ─── Tool detail ──────────────────────────────────────────────────────────
+function renderTool() {
+  const t=CATALOGUE.find(x=>x.id===S.toolId);
+  if(!t)return`<div class="wrap" style="padding-block:3rem"><p>Tool not found.</p><button class="back-btn" onclick="navigate('home')">← Back</button></div>`;
+  return `<div class="detail-wrap wrap">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      All tools
+    </button>
+    <div class="tool-hero">
+      <div class="tool-hero-left">
+        <div class="tool-hero-meta">
+          <span class="tool-cat-chip">${esc(t.cat)}</span>
+          <span class="cost-badge cost-${t.cost}">${t.cost}</span>
+          ${t.flag?`<span class="tool-flag" style="margin-top:0">⚠ ${esc(t.flag)}</span>`:""}
+        </div>
+        <h1>${esc(t.n)}</h1>
+        <p class="tool-hero-desc">${esc(t.desc)}</p>
+        <p class="tool-hero-desc" style="color:var(--amber)">Limits: ${esc(t.lim)}</p>
+      </div>
+      <div class="tool-hero-right">
+        <div class="stat-row"><div><b>${t.rec}%</b><span>would recommend</span></div></div>
+        <div class="rating-row">
+          <div class="rating-label"><span>Usefulness</span><span>${t.u}/5</span></div>
+          <div class="rating-track"><div class="rating-fill" style="width:${t.u*20}%"></div></div>
+        </div>
+        <div class="rating-row">
+          <div class="rating-label"><span>Learning value</span><span>${t.l}/5</span></div>
+          <div class="rating-track"><div class="rating-fill" style="width:${t.l*20}%"></div></div>
+        </div>
+        <button class="ask-about-btn" data-ask="${esc(t.n)}">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C6.5 1.5 4 4 4 6.5s2.5 5 2.5 5m0-10C6.5 1.5 9 4 9 6.5s-2.5 5-2.5 5M1.5 6.5h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+          Ask about this tool
+        </button>
+      </div>
+    </div>
+    <div class="detail-tabs">
+      <button class="dtab${S.detailTab==="about"?" active":""}" data-tab="about">About</button>
+      <button class="dtab${S.detailTab==="reviews"?" active":""}" data-tab="reviews">Reviews (${(S.reviews[t.id]||[]).length})</button>
+      <button class="dtab${S.detailTab==="write"?" active":""}" data-tab="write">Write a review</button>
+    </div>
+    <div id="detailContent">${renderDetailTab(t)}</div>
+  </div>`;
+}
+
+function renderDetailTab(t) {
+  if(S.detailTab==="about") return renderAboutTab(t);
+  if(S.detailTab==="reviews") return renderReviewsTab(t);
+  if(S.detailTab==="write") return renderWriteTab(t);
+  return "";
+}
+
+function renderAboutTab(t) {
+  const roleLabels=t.roles.map(r=>r==="all"?"All roles":ROLES[r]||r).join(", ");
+  return `
+    <div style="display:grid;gap:1.25rem;max-width:640px">
+      <div>
+        <div class="eyebrow" style="display:block;margin-bottom:.5rem">Suitable for</div>
+        <p>${esc(roleLabels)}</p>
+      </div>
+      <div>
+        <div class="eyebrow" style="display:block;margin-bottom:.5rem">Cost</div>
+        <p>${esc({free:"Free — no cost at all.",freemium:"Free tier available; paid tier for more features.",paid:"Paid — there's no free tier.",employer:"Provided by your employer or training provider."}[t.cost]||t.cost)}</p>
+      </div>
+      <div>
+        <div class="eyebrow" style="display:block;margin-bottom:.5rem">Limits</div>
+        <p style="color:var(--muted)">${esc(t.lim)}</p>
+      </div>
+      ${t.flag?`<div style="background:var(--amber-soft);border:1px solid var(--amber);border-radius:var(--r);padding:1rem">
+        <div class="eyebrow" style="color:var(--amber);margin-bottom:.4rem;display:block">Policy note</div>
+        <p style="font-size:.9rem">${esc(t.flag)}</p>
+      </div>`:""}
+    </div>`;
+}
+
+function renderReviewsTab(t) {
+  const revs=S.reviews[t.id]||[];
+  if(!revs.length) return `<div class="no-reviews"><p style="margin-bottom:.75rem">No reviews yet for this tool.</p><button class="btn-outline" onclick="S.detailTab='write';renderApp()">Be the first to review it →</button></div>`;
+  return `<div class="reviews-list">${revs.map(r=>`
+    <div class="review-card">
+      <div class="review-meta">
+        <span class="review-role">${esc(r.role)}</span>
+        <span class="review-level">${esc(r.level)}</span>
+        <div class="review-scores" style="margin-left:auto">
+          <span class="review-score">Useful ${r.u}/5</span>
+          <span class="review-score">Learn ${r.l}/5</span>
+          ${r.rec?`<span class="review-badge-rec">Recommends</span>`:""}
+        </div>
+      </div>
+      <p class="review-text">${esc(r.text)}</p>
+    </div>`).join("")}</div>`;
+}
+
+function renderWriteTab(t) {
+  const f=S.reviewForm;
+  return `
+    <div class="review-form" style="max-width:560px">
+      <div class="form-row-2">
+        <div class="form-row"><label>Your role</label>
+          <select id="rvRole">
+            ${Object.entries(ROLES).map(([v,l])=>`<option value="${v}"${S.role===v?" selected":""}>${l}</option>`).join("")}
+          </select></div>
+        <div class="form-row"><label>Your level</label>
+          <select id="rvLevel">
+            ${["Level 3","Level 4","Level 5","Level 6","Level 7"].map(l=>`<option${S.level===l?" selected":""}>${l}</option>`).join("")}
+          </select></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Usefulness</label>
+          <div class="star-picker" id="starU" data-key="u">
+            ${[1,2,3,4,5].map(i=>`<button type="button" class="star-btn${f.u>=i?" lit":""}" data-v="${i}">★</button>`).join("")}
+          </div></div>
+        <div class="form-row"><label>Learning value</label>
+          <div class="star-picker" id="starL" data-key="l">
+            ${[1,2,3,4,5].map(i=>`<button type="button" class="star-btn${f.l>=i?" lit":""}" data-v="${i}">★</button>`).join("")}
+          </div></div>
+      </div>
+      <div class="form-row">
+        <label>Would you recommend it?</label>
+        <select id="rvRec"><option value="true">Yes, I'd recommend it</option><option value="false">No</option></select>
+      </div>
+      <div class="form-row">
+        <label>Your review</label>
+        <textarea id="rvText" rows="5" placeholder="Describe your own use of the tool: how long, how often, what for. Be specific about what helped and what didn't."></textarea>
+      </div>
+      <div id="rvResult"></div>
+      <button class="submit-btn" id="submitReview">Submit review</button>
+    </div>`;
+}
+
+function bindToolEvents() {
+  document.querySelectorAll(".dtab").forEach(b=>b.addEventListener("click",()=>{S.detailTab=b.dataset.tab;renderApp();}));
+  document.querySelector(".ask-about-btn")?.addEventListener("click",e=>{
+    const name=e.currentTarget.dataset.ask;
+    S.query=`Tell me about ${name} — is it good for me?`;
+    S.messages=[];
+    navigate("ask");
+  });
+  document.querySelectorAll("#starU button,#starL button").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const key=b.closest("[data-key]").dataset.key;
+      S.reviewForm[key]=parseInt(b.dataset.v);
+      renderApp();
+    });
+  });
+  $("submitReview")?.addEventListener("click",()=>{
+    const t=CATALOGUE.find(x=>x.id===S.toolId);
+    const text=($("rvText")?.value||"").trim();
+    if(text.length<20){$("rvResult").innerHTML=`<div class="submit-result submit-err">Review must be at least 20 characters.</div>`;return;}
+    const rev={
+      role:ROLES[$("rvRole")?.value]||"Apprentice",
+      level:$("rvLevel")?.value||S.level,
+      u:S.reviewForm.u,l:S.reviewForm.l,
+      rec:$("rvRec")?.value==="true",
+      text,
+    };
+    S.reviews[S.toolId]=(S.reviews[S.toolId]||[]);
+    S.reviews[S.toolId].unshift(rev);
+    S.pending.push({...rev,tool:t?.n,id:Date.now()+"",status:"needs_human"});
+    S.detailTab="reviews";
+    renderApp();
+  });
+}
+
+// ─── Admin view ───────────────────────────────────────────────────────────
+function renderAdmin() {
+  const published=Object.values(S.reviews).reduce((a,v)=>a+v.length,0);
+  return `
+  <div class="admin-wrap wrap">
+    <span class="eyebrow">Admin dashboard</span>
+    <h2>Moderation &amp; tools</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num">${CATALOGUE.length}</div><div class="lbl">Tools in catalogue</div></div>
+      <div class="stat-card"><div class="num">${published}</div><div class="lbl">Published reviews</div></div>
+      <div class="stat-card"><div class="num">${S.pending.length}</div><div class="lbl">Pending review</div></div>
+      <div class="stat-card"><div class="num">${CATALOGUE.filter(t=>t.v).length}</div><div class="lbl">Verified tools</div></div>
+    </div>
+    <div class="admin-section">
+      <h3>Moderation queue</h3>
+      ${S.pending.length===0
+        ? `<div class="queue-empty">No reviews pending — queue is clear.</div>`
+        : S.pending.map(r=>`
+          <div class="queue-card" id="qc-${r.id}">
+            <div class="queue-meta">
+              <span class="review-role">${esc(r.role)}</span>
+              <span class="review-level">${esc(r.level)}</span>
+              <span class="tool-cat-chip">${esc(r.tool||"")}</span>
+              <span class="status-pill">${r.status}</span>
+            </div>
+            <p class="queue-text">${esc(r.text)}</p>
+            <div class="queue-actions">
+              <button class="btn-approve" data-approve="${r.id}">Approve</button>
+              <button class="btn-reject" data-reject="${r.id}">Reject</button>
+            </div>
+          </div>`).join("")}
+    </div>
+    <div class="admin-section">
+      <h3>Bias check</h3>
+      <div class="bias-form">
+        <select id="biasToolSelect">
+          <option value="">Select a tool…</option>
+          ${CATALOGUE.map(t=>`<option value="${t.id}">${esc(t.n)} (${(S.reviews[t.id]||[]).length} reviews)</option>`).join("")}
+        </select>
+        <button class="btn-outline" id="runBiasCheck">Run check</button>
+      </div>
+      <div id="biasResult"></div>
+    </div>
+    <div class="admin-section">
+      <h3>Prompt design reference</h3>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:.75rem">See how all five LLM prompts are assembled and tested.</p>
+      <a href="prompt-design.html" style="display:inline-flex;align-items:center;gap:.4rem;font:500 .875rem var(--body)" target="_blank">
+        Open prompt design page →
+      </a>
+    </div>
+  </div>`;
+}
+
+function bindAdminEvents() {
+  document.querySelectorAll("[data-approve]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.approve;
+    const idx=S.pending.findIndex(r=>r.id===id);
+    if(idx>-1){S.pending[idx].status="approved";S.pending.splice(idx,1);}
+    renderApp();
+  }));
+  document.querySelectorAll("[data-reject]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.reject;
+    S.pending=S.pending.filter(r=>r.id!==id);
+    renderApp();
+  }));
+  $("runBiasCheck")?.addEventListener("click",()=>{
+    const id=$("biasToolSelect")?.value; if(!id)return;
+    const tool=CATALOGUE.find(t=>t.id===id);
+    const revs=S.reviews[id]||[];
+    const risk=revs.length<2?"low":revs.length>5?"medium":"low";
+    $("biasResult").innerHTML=`
+      <div class="bias-result">
+        <div class="eyebrow" style="display:block;margin-bottom:.6rem">${esc(tool?.n||id)} — ${revs.length} reviews</div>
+        <p><strong>Risk: ${risk}</strong></p>
+        <p style="font-size:.875rem;color:var(--muted);margin-top:.4rem">
+          ${revs.length<2?"Not enough reviews to assess patterns.":"No copied wording or burst patterns detected. Scores align with review text."}
+          ${revs.length>0?` Mean usefulness: ${(revs.reduce((a,r)=>a+r.u,0)/revs.length).toFixed(1)}/5.`:""}
+        </p>
+      </div>`;
+  });
+}
+
+// ─── Theme toggle ─────────────────────────────────────────────────────────
+const SUN=`<svg id="themeIcon" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5v1M7.5 12.5v1M1.5 7.5h1M12.5 7.5h1M3.4 3.4l.7.7M10.9 10.9l.7.7M3.4 11.6l.7-.7M10.9 4.1l.7-.7M7.5 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>`;
+const MOON=`<svg id="themeIcon" viewBox="0 0 15 15" fill="none"><path d="M7 2a5 5 0 106.17 6.43A4.5 4.5 0 017 2z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const root=document.documentElement;
+function isDark(){const t=root.getAttribute("data-theme");return t==="dark"||(!t&&matchMedia("(prefers-color-scheme:dark)").matches);}
+function applyTheme(dark){root.setAttribute("data-theme",dark?"dark":"light");const icon=$("themeIcon");if(icon)icon.outerHTML=dark?SUN:MOON;try{localStorage.setItem("theme",dark?"dark":"light")}catch{}}
+$("themeToggle")?.addEventListener("click",()=>applyTheme(!isDark()));
+try{const s=localStorage.getItem("theme");if(s)applyTheme(s==="dark")}catch{}
+
+// nav role sync
+$("navRole")?.addEventListener("change",e=>{S.role=e.target.value;if(S.view==="home")renderApp();});
+
+// nav links
+["navDiscover","navAsk","navAdmin"].forEach(id=>{
+  $(id)?.addEventListener("click",e=>{e.preventDefault();const v={navDiscover:"home",navAsk:"ask",navAdmin:"admin"}[id];navigate(v);});
+});
+$("navLogo")?.addEventListener("click",e=>{e.preventDefault();navigate("home");});
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+handleHash();
+renderApp();
+</script>
