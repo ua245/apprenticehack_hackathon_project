@@ -1,0 +1,10 @@
+{
+  "description": "This web application connects aspiring developers with mentors, offering personalized guidance and resources to enhance their coding skills and career prospects.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
